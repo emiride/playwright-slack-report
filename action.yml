@@ -1,0 +1,12 @@
+name: 'Playwright Report to Slack'
+description: 'Send condensed Playwright report to Slack'
+inputs:
+  slack-webhook-url: 
+    description: 'Webhook URL for Slack'
+    required: true
+# outputs:
+#   time: # id of output
+#     description: 'The time we greeted you'
+runs:
+  using: 'node16'
+  main: 'index.js'
