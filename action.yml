@@ -7,6 +7,9 @@ inputs:
   slack-webhook-url: 
     description: 'Webhook URL for Slack'
     required: true
+  directory-path:
+    description: 'Directory path to JUnit XML file'
+    required: true
 # outputs:
 #   time: # id of output
 #     description: 'The time we greeted you'

@@ -19085,9 +19085,11 @@ var index_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _ar
 
 
 main_default().config();
-let slackWebhookUrl = core.getInput("") ? core.getInput("") : process.env.SLACK_WEBHOOK_URL;
+let slackWebhookUrl = core.getInput("slack-webhook-url") ? core.getInput("slack-webhook-url") : process.env.SLACK_WEBHOOK_URL;
+let testOutputFile = core.getInput("directory-path") ? core.getInput("directory-path") : process.env.TEST_OUTPUT_FILE;
+console.log('working directory: ' + __dirname);
 (() => index_awaiter(void 0, void 0, void 0, function* () {
-    const result = new ResultsParser("results2.xml");
+    const result = new ResultsParser(__nccwpck_require__.ab + "results.xml");
     yield result.parse();
     yield new SlackMessage(result).send(slackWebhookUrl, new ActionInfo());
 }))();
