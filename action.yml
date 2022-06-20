@@ -1,5 +1,8 @@
 name: 'Playwright Report to Slack'
 description: 'Send condensed Playwright report to Slack'
+branding:
+    icon: "bell"
+    color: "green"
 inputs:
   slack-webhook-url: 
     description: 'Webhook URL for Slack'
