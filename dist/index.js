@@ -19047,14 +19047,7 @@ class ActionInfo {
     }
 }
 
-// EXTERNAL MODULE: external "path"
-var external_path_ = __nccwpck_require__(1017);
-var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
-// EXTERNAL MODULE: external "url"
-var external_url_ = __nccwpck_require__(7310);
 ;// CONCATENATED MODULE: ./index.ts
-
-
 
 
 
@@ -19063,13 +19056,9 @@ var external_url_ = __nccwpck_require__(7310);
 main_default().config();
 let slackWebhookUrl = core.getInput("slack-webhook-url") ? core.getInput("slack-webhook-url") : process.env.SLACK_WEBHOOK_URL;
 let testOutputFile = core.getInput("directory-path") ? core.getInput("directory-path") : process.env.TEST_OUTPUT_FILE;
-const index_filename = (0,external_url_.fileURLToPath)("file:///Users/emir/iohk/playwright-slack-report/index.ts");
-const index_dirname = external_path_default().dirname(index_filename);
-const rootDir = index_dirname.split('_actions')[0];
-console.log('working directory: ' + rootDir);
-console.log('test output file: ' + testOutputFile);
 (async () => {
-    const result = new ResultsParser(rootDir + testOutputFile);
+    const workspacePath = process.env.GITHUB_WORKSPACE;
+    const result = new ResultsParser(workspacePath + testOutputFile);
     await result.parse();
     await new SlackMessage(result).send(slackWebhookUrl, new ActionInfo());
 })();
