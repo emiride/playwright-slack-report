@@ -1,5 +1,5 @@
-name: 'Playwright Report to Slack'
-description: 'Send condensed Playwright report to Slack'
+name: 'JUnit XML to Slack'
+description: 'Send condensed Junit report to Slack'
 branding:
     icon: "bell"
     color: "green"
