@@ -18880,15 +18880,6 @@ var external_fs_ = __nccwpck_require__(7147);
 // EXTERNAL MODULE: ./node_modules/junit2json/dist/index.js
 var dist = __nccwpck_require__(3578);
 ;// CONCATENATED MODULE: ./app/results-parser.ts
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 
 
 class TestResult {
@@ -18907,26 +18898,24 @@ class ResultsParser {
         this.executionTime = "";
         this.failedTestsList = [];
     }
-    parse() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const file = external_fs_.readFileSync(this.filePath, 'utf8');
-            const output = yield (0,dist.parse)(file);
-            const timeSeconds = Math.floor(output["time"]);
-            this.executionTime = Math.floor(timeSeconds / 60) + "m " + timeSeconds % 60 + "s";
-            const testResults = this.extract(output["testsuite"]);
-            for (let testResult of testResults) {
-                if (testResult.status === "failed") {
-                    this.failedTests++;
-                    this.failedTestsList.push(testResult.name);
-                }
-                else if (testResult.status === "skipped") {
-                    this.skippedTests++;
-                }
-                else if (testResult.status === "passed") {
-                    this.passedTests++;
-                }
+    async parse() {
+        const file = external_fs_.readFileSync(this.filePath, 'utf8');
+        const output = await (0,dist.parse)(file);
+        const timeSeconds = Math.floor(output["time"]);
+        this.executionTime = Math.floor(timeSeconds / 60) + "m " + timeSeconds % 60 + "s";
+        const testResults = this.extract(output["testsuite"]);
+        for (let testResult of testResults) {
+            if (testResult.status === "failed") {
+                this.failedTests++;
+                this.failedTestsList.push(testResult.name);
             }
-        });
+            else if (testResult.status === "skipped") {
+                this.skippedTests++;
+            }
+            else if (testResult.status === "passed") {
+                this.passedTests++;
+            }
+        }
     }
     extract(testsuites) {
         const testResults = [];
@@ -18956,27 +18945,16 @@ class ResultsParser {
 // EXTERNAL MODULE: ./node_modules/@slack/webhook/dist/index.js
 var webhook_dist = __nccwpck_require__(6439);
 ;// CONCATENATED MODULE: ./app/slack-message.ts
-var slack_message_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 //@ts-check
 
 class SlackMessage {
     constructor(testResults) {
         this.testResults = testResults;
     }
-    send(slackWebhookUrl, actionInfo) {
-        return slack_message_awaiter(this, void 0, void 0, function* () {
-            const webhook = new webhook_dist/* IncomingWebhook */.QU(slackWebhookUrl);
-            const blocks = this.getBlocks(this.testResults);
-            yield webhook.send({ text: "Test results", blocks: JSON.parse(blocks) });
-        });
+    async send(slackWebhookUrl, actionInfo) {
+        const webhook = new webhook_dist/* IncomingWebhook */.QU(slackWebhookUrl);
+        const blocks = this.getBlocks(this.testResults);
+        await webhook.send({ text: "Test results", blocks: JSON.parse(blocks) });
     }
     getFailedTestsSections(failed, failedTestsList) {
         const template = (testName, isFailed) => `{
@@ -19075,15 +19053,6 @@ var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
 // EXTERNAL MODULE: external "url"
 var external_url_ = __nccwpck_require__(7310);
 ;// CONCATENATED MODULE: ./index.ts
-var index_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 
 
 
@@ -19099,11 +19068,11 @@ const index_dirname = external_path_default().dirname(index_filename);
 const rootDir = index_dirname.split('_actions')[0];
 console.log('working directory: ' + rootDir);
 console.log('test output file: ' + testOutputFile);
-(() => index_awaiter(void 0, void 0, void 0, function* () {
+(async () => {
     const result = new ResultsParser(rootDir + testOutputFile);
-    yield result.parse();
-    yield new SlackMessage(result).send(slackWebhookUrl, new ActionInfo());
-}))();
+    await result.parse();
+    await new SlackMessage(result).send(slackWebhookUrl, new ActionInfo());
+})();
 
 })();
 
