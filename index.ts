@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import * as core from '@actions/core';
+import * as github from '@actions/github';
 import ResultsParser from './app/results-parser.js';
 import SlackMessage from './app/slack-message.js';
 import ActionInfo from './app/action-info.js';
