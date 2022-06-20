@@ -1,5 +1,6 @@
 //@ts-check
 import { IncomingWebhook } from '@slack/webhook';
+import ActionInfo from './action-info';
 import ResultsParser from './results-parser';
 
 export default class SlackMessage {
@@ -8,9 +9,9 @@ export default class SlackMessage {
     this.testResults = testResults;
   }
 
-  async send(slackWebhookUrl: string, actionInfo) {
+  async send(slackWebhookUrl: string, actionInfo: ActionInfo): Promise<void> {
     const webhook = new IncomingWebhook(slackWebhookUrl);
-    const blocks = this.getBlocks(this.testResults);
+    const blocks = this.getBlocks(this.testResults, actionInfo);
     await webhook.send({ text: "Test results", blocks: JSON.parse(blocks) });
   }
 
@@ -30,7 +31,7 @@ export default class SlackMessage {
     }
   }
 
-  getBlocks(testResults: ResultsParser): string {
+  getBlocks(testResults: ResultsParser, actionInfo: ActionInfo): string {
     const failedTests = testResults.failedTests;
     const skippedTests = testResults.skippedTests;
     const passedTests = testResults.passedTests;
@@ -44,7 +45,7 @@ export default class SlackMessage {
         "elements": [
             {
                 "type": "plain_text",
-                "text": "Action: TODO",
+                "text": "Action: ${actionInfo.workflowName}",
                 "emoji": true
             }
         ]
@@ -84,7 +85,7 @@ export default class SlackMessage {
                     "emoji": true
                 },
                 "value": "action_go",
-                "url": "https://google.com"
+                "url": "${actionInfo.runUrl}"
             }
         ]
     }

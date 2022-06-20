@@ -18953,7 +18953,7 @@ class SlackMessage {
     }
     async send(slackWebhookUrl, actionInfo) {
         const webhook = new webhook_dist/* IncomingWebhook */.QU(slackWebhookUrl);
-        const blocks = this.getBlocks(this.testResults);
+        const blocks = this.getBlocks(this.testResults, actionInfo);
         await webhook.send({ text: "Test results", blocks: JSON.parse(blocks) });
     }
     getFailedTestsSections(failed, failedTestsList) {
@@ -18971,7 +18971,7 @@ class SlackMessage {
             return failedTestsList.map(testName => template(testName, true)).join("\n");
         }
     }
-    getBlocks(testResults) {
+    getBlocks(testResults, actionInfo) {
         const failedTests = testResults.failedTests;
         const skippedTests = testResults.skippedTests;
         const passedTests = testResults.passedTests;
@@ -18985,7 +18985,7 @@ class SlackMessage {
         "elements": [
             {
                 "type": "plain_text",
-                "text": "Action: TODO",
+                "text": "Action: ${actionInfo.workflowName}",
                 "emoji": true
             }
         ]
@@ -19025,7 +19025,7 @@ class SlackMessage {
                     "emoji": true
                 },
                 "value": "action_go",
-                "url": "https://google.com"
+                "url": "${actionInfo.runUrl}"
             }
         ]
     }
