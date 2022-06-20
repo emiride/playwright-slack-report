@@ -19058,7 +19058,7 @@ let slackWebhookUrl = core.getInput("slack-webhook-url") ? core.getInput("slack-
 let testOutputFile = core.getInput("directory-path") ? core.getInput("directory-path") : process.env.TEST_OUTPUT_FILE;
 (async () => {
     const workspacePath = process.env.GITHUB_WORKSPACE;
-    const result = new ResultsParser(workspacePath + testOutputFile);
+    const result = new ResultsParser(workspacePath + '/' + testOutputFile);
     await result.parse();
     await new SlackMessage(result).send(slackWebhookUrl, new ActionInfo());
 })();
