@@ -19014,7 +19014,7 @@ class SlackMessage {
             "text": ":clock1: *Execution time:* ${testResults.executionTime}"
         }
     },
-    ${overralTestsSection},
+    ${overralTestsSection}
     {
         "type": "divider"
     },
