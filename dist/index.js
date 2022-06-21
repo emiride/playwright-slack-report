@@ -18973,13 +18973,13 @@ class SlackMessage {
     }
     getOverralTestsSection(passedTests, skippedTests, failedTests) {
         const passedSubstring = passedTests > 0 ? `:large_green_circle: *PASSED: ${passedTests}*` : "";
-        const skippedSubstring = skippedTests > 0 ? `:heavy_minus_sign: *SKIPPED: ${skippedTests}*` : "";
         const failedSubstring = failedTests > 0 ? `:red_circle: *FAILED: ${failedTests}*` : "";
+        const skippedSubstring = skippedTests > 0 ? `:white_circle: *SKIPPED: ${skippedTests}*` : "";
         const template = (passedTests, skippedTests, failedTests) => `{
         "type": "section",
         "text": {
             "type": "mrkdwn",
-            "text": "${passedSubstring} ${skippedSubstring} ${failedSubstring}"
+            "text": "${passedSubstring} ${failedSubstring} ${skippedSubstring}"
         }
     },`;
         return template(passedTests, skippedTests, failedTests);
