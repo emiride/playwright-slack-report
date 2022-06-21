@@ -12,11 +12,11 @@ export default class SlackMessage {
   async send(slackWebhookUrl: string, actionInfo: ActionInfo): Promise<void> {
     const webhook = new IncomingWebhook(slackWebhookUrl);
     const blocks = this.getBlocks(this.testResults, actionInfo);
-    await webhook.send({ text: "Test results", blocks: JSON.parse(blocks) });
+    await webhook.send({ text: `${actionInfo.workflowName} - ${this.testResults.failedTests > 0 ? "Failed": "Passed"}`, blocks: JSON.parse(blocks) });
   }
 
   private getFailedTestsSections(failed, failedTestsList: string[]): string {
-    const template = (testName, isFailed) =>  `{
+    const template = (testName: string, isFailed: boolean) =>  `{
         "type": "section",
         "text": {
             "type": "mrkdwn",
@@ -31,6 +31,21 @@ export default class SlackMessage {
     }
   }
 
+  private getOverralTestsSection(passedTests, skippedTests, failedTests): string {
+    const passedSubstring = passedTests > 0 ? `:large_green_circle: *PASSED: ${passedTests}*` : "";
+    const skippedSubstring = skippedTests > 0 ? `:heavy_minus_sign: *SKIPPED: ${skippedTests}*` : "";
+    const failedSubstring = failedTests > 0 ? `:red_circle: *FAILED: ${failedTests}*` : "";
+    const template = (passedTests, skippedTests, failedTests) => `{
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "${passedSubstring} ${skippedSubstring} ${failedSubstring}"
+        }
+    },`;
+    return template(passedTests, skippedTests, failedTests);
+    
+}
+
   getBlocks(testResults: ResultsParser, actionInfo: ActionInfo): string {
     const failedTests = testResults.failedTests;
     const skippedTests = testResults.skippedTests;
@@ -38,6 +53,7 @@ export default class SlackMessage {
     const failedTestsList = testResults.failedTestsList;
     const failed = failedTests > 0;
     const failedTestsSections = this.getFailedTestsSections(failed, failedTestsList);
+    const overralTestsSection = this.getOverralTestsSection(passedTests, skippedTests, failedTests);
   const nesta = `
   [
     {
@@ -57,16 +73,10 @@ export default class SlackMessage {
         "type": "section",
         "text": {
             "type": "mrkdwn",
-            "text": "${failed ? ":red_circle: *FAILED*" : ":large_green_circle: *PASSED*"}"
-        }
-    },
-    {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
             "text": ":clock1: *Execution time:* ${testResults.executionTime}"
         }
     },
+    ${overralTestsSection},
     {
         "type": "divider"
     },

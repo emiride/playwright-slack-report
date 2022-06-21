@@ -18954,7 +18954,7 @@ class SlackMessage {
     async send(slackWebhookUrl, actionInfo) {
         const webhook = new webhook_dist/* IncomingWebhook */.QU(slackWebhookUrl);
         const blocks = this.getBlocks(this.testResults, actionInfo);
-        await webhook.send({ text: "Test results", blocks: JSON.parse(blocks) });
+        await webhook.send({ text: `${actionInfo.workflowName} - ${this.testResults.failedTests > 0 ? "Failed" : "Passed"}`, blocks: JSON.parse(blocks) });
     }
     getFailedTestsSections(failed, failedTestsList) {
         const template = (testName, isFailed) => `{
@@ -18971,6 +18971,19 @@ class SlackMessage {
             return failedTestsList.map(testName => template(testName, true)).join("\n");
         }
     }
+    getOverralTestsSection(passedTests, skippedTests, failedTests) {
+        const passedSubstring = passedTests > 0 ? `:large_green_circle: *PASSED: ${passedTests}*` : "";
+        const skippedSubstring = skippedTests > 0 ? `:heavy_minus_sign: *SKIPPED: ${skippedTests}*` : "";
+        const failedSubstring = failedTests > 0 ? `:red_circle: *FAILED: ${failedTests}*` : "";
+        const template = (passedTests, skippedTests, failedTests) => `{
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "${passedSubstring} ${skippedSubstring} ${failedSubstring}"
+        }
+    },`;
+        return template(passedTests, skippedTests, failedTests);
+    }
     getBlocks(testResults, actionInfo) {
         const failedTests = testResults.failedTests;
         const skippedTests = testResults.skippedTests;
@@ -18978,6 +18991,7 @@ class SlackMessage {
         const failedTestsList = testResults.failedTestsList;
         const failed = failedTests > 0;
         const failedTestsSections = this.getFailedTestsSections(failed, failedTestsList);
+        const overralTestsSection = this.getOverralTestsSection(passedTests, skippedTests, failedTests);
         const nesta = `
   [
     {
@@ -18997,16 +19011,10 @@ class SlackMessage {
         "type": "section",
         "text": {
             "type": "mrkdwn",
-            "text": "${failed ? ":red_circle: *FAILED*" : ":large_green_circle: *PASSED*"}"
-        }
-    },
-    {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
             "text": ":clock1: *Execution time:* ${testResults.executionTime}"
         }
     },
+    ${overralTestsSection},
     {
         "type": "divider"
     },
